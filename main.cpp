@@ -162,6 +162,7 @@ int main(int argc, char *argv[])
     AVFrame *frame = av_frame_alloc();
     // 像素格式转换上下文
     SwsContext *vctx = NULL;
+    unsigned char *rgb = NULL;
     for(;;) {
         int ret = av_read_frame(ic, pkt);
         if(ret != 0) {
@@ -222,8 +223,28 @@ int main(int argc, char *argv[])
                             SWS_BILINEAR, // 尺寸变化算法
                             0, 0, 0
                             );
-                if(vctx != NULL) {
-                    cout << "SwsContext create successfully" << endl;
+                //                if(vctx != NULL) {
+                //                    cout << "SwsContext create successfully" << endl;
+                //                }
+
+                if(vctx) {
+                    // 像素格式转换代码
+                    if(!rgb)
+                        rgb = new unsigned char[frame->width * frame->height * 4];
+                    uint8_t *data[2] = {0};
+                    data[0] = rgb;
+                    int lines[2] = {0};
+                    lines[0] = frame->width * 4;
+                    ret = sws_scale(
+                                vctx,
+                                frame->data,    // 输入数据
+                                frame->linesize, // 输入行大小
+                                0,
+                                frame->height, // 输入高度
+                                data,   // 输出数据和大小
+                                lines
+                                );
+                    cout << "sws_scale = " << ret << endl;
                 }
             }
         }
