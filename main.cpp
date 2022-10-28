@@ -11,6 +11,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 #include "libavutil/avutil.h"
+#include "libswresample/swresample.h"
 }
 
 static double r2d(AVRational r) {
@@ -163,6 +164,40 @@ int main(int argc, char *argv[])
     // 像素格式转换上下文
     SwsContext *vctx = NULL;
     unsigned char *rgb = NULL;
+
+    // 音频重采样 上下文初始化
+    SwrContext *actx = swr_alloc();
+    unsigned char *pcm = NULL;
+    ret = swr_alloc_set_opts2(
+                &actx,              // 重采样上下文
+                &ac->ch_layout,     // 输出格式
+                AV_SAMPLE_FMT_S16,  // 输出样本格式
+                ac->sample_rate,    // 输出采样率
+                &ac->ch_layout,     // 输入格式
+                ac->sample_fmt,     // 输入样本格式
+                ac->sample_rate,    // 输入采样率
+                0, 0
+                );
+    if(ret != 0) {
+        char buf[1024] = {0};
+        av_strerror(ret, buf, sizeof(buf) - 1);
+        cout << "swr_alloc_set_opts2 failed!" << endl;
+        getchar();
+        return -1;
+    }
+
+    cout << "swr_alloc_set_opts2 success " << ret << endl;
+
+    ret = swr_init(actx);
+    if(ret != 0) {
+        char buf[1024] = {0};
+        av_strerror(ret, buf, sizeof(buf) - 1);
+        cout << "swr_init failed!" << endl;
+        getchar();
+        return -1;
+    }
+
+
     for(;;) {
         int ret = av_read_frame(ic, pkt);
         if(ret != 0) {
@@ -235,17 +270,29 @@ int main(int argc, char *argv[])
                     data[0] = rgb;
                     int lines[2] = {0};
                     lines[0] = frame->width * 4;
-                    ret = sws_scale(
-                                vctx,
-                                frame->data,    // 输入数据
-                                frame->linesize, // 输入行大小
-                                0,
-                                frame->height, // 输入高度
-                                data,   // 输出数据和大小
-                                lines
-                                );
+                    // 该函数消耗大
+                    ret = sws_scale( // 该函数返回转换后高度
+                                     vctx,
+                                     frame->data,    // 输入数据
+                                     frame->linesize, // 输入行大小
+                                     0,
+                                     frame->height, // 输入高度
+                                     data,   // 输出数据和大小
+                                     lines
+                                     );
                     cout << "sws_scale = " << ret << endl;
                 }
+            }
+            else {
+                uint8_t *data[2] = {0};
+                if(!pcm)
+                    pcm = new uint8_t[frame->nb_samples * ac->ch_layout.nb_channels * 2];
+                data[0] = pcm;
+                ret = swr_convert(actx,
+                                  data, frame->nb_samples,
+                                  const_cast<const uint8_t**>(frame->data), frame->nb_samples
+                                  );
+                cout << "swr_convert = " << ret << endl;
             }
         }
 
