@@ -9,6 +9,8 @@ using namespace std;
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
+#include "libavutil/avutil.h"
 }
 
 static double r2d(AVRational r) {
@@ -24,7 +26,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-//    w.show();
+    //    w.show();
 
     cout << "Test Demux FFmpeg.club" << endl;
 
@@ -44,16 +46,16 @@ int main(int argc, char *argv[])
 
     //解封装上下文
     AVFormatContext *ic = NULL;
-    int re = avformat_open_input(
+    int ret = avformat_open_input(
                 &ic,
                 path,
                 0,  // 0表示自动选择解封器
                 &opts //参数设置，比如rtsp的延时时间
                 );
-    if (re != 0)
+    if (ret != 0)
     {
         char buf[1024] = { 0 };
-        av_strerror(re, buf, sizeof(buf) - 1);
+        av_strerror(ret, buf, sizeof(buf) - 1);
         cout << "open " << path << " failed! :" << buf << endl;
         getchar();
         return -1;
@@ -61,7 +63,7 @@ int main(int argc, char *argv[])
     cout << "open " << path << " success! " << endl;
 
     //获取流信息
-    re = avformat_find_stream_info(ic, 0);
+    ret = avformat_find_stream_info(ic, 0);
 
     //总时长 毫秒
     int totalMs = ic->duration / (AV_TIME_BASE / 1000);
@@ -93,7 +95,73 @@ int main(int argc, char *argv[])
         }
     }
 
+
+    ///////////////////////////////////////////////////////////////////
+    /// 寻找视频解码器
+    AVCodec const *vcodec = avcodec_find_decoder(ic->streams[videoStream]->codecpar->codec_id);
+
+    if(!vcodec) {
+        cout << "can't find codec id" << endl;
+        getchar();
+        return -1;
+    }
+
+    cout << "Find codec id = " << ic->streams[videoStream]->codecpar->codec_id << endl;
+
+    //创建解码器上下文
+    AVCodecContext *vc = avcodec_alloc_context3(vcodec);
+    // 配置解码器上下文参数
+    avcodec_parameters_to_context(vc, ic->streams[videoStream]->codecpar);
+    // 设置解码线程数
+    vc->thread_count = 8;
+
+    // 打开解码器上下文
+    ret = avcodec_open2(vc, 0, 0);
+    if(ret != 0) {
+        char buf[1024] = {0};
+        av_strerror(ret, buf, sizeof(buf) - 1);
+        cout << "avcodec_open2 failed : " << buf << endl;
+        getchar();
+        return -1;
+    }
+    cout << "video avcodec_open2 success" << endl;
+
+
+    ///////////////////////////////////////////////////////////////////
+    /// 寻找音频解码器
+    AVCodec const *acodec = avcodec_find_decoder(ic->streams[audioStream]->codecpar->codec_id);
+
+    if(!acodec) {
+        cout << "can't find codec id" << endl;
+        getchar();
+        return -1;
+    }
+
+    cout << "Find codec id = " << ic->streams[audioStream]->codecpar->codec_id << endl;
+
+    //创建解码器上下文
+    AVCodecContext *ac = avcodec_alloc_context3(acodec);
+    // 配置解码器上下文参数
+    avcodec_parameters_to_context(ac, ic->streams[audioStream]->codecpar);
+    // 设置解码线程数
+    ac->thread_count = 8;
+
+    // 打开解码器上下文
+    ret = avcodec_open2(ac, 0, 0);
+    if(ret != 0) {
+        char buf[1024] = {0};
+        av_strerror(ret, buf, sizeof(buf) - 1);
+        cout << "avcodec_open2 failed : " << buf << endl;
+        getchar();
+        return -1;
+    }
+    cout << "audio avcodec_open2 success" << endl;
+
+
     AVPacket *pkt = av_packet_alloc();
+    AVFrame *frame = av_frame_alloc();
+    // 像素格式转换上下文
+    SwsContext *vctx = NULL;
     for(;;) {
         int ret = av_read_frame(ic, pkt);
         if(ret != 0) {
@@ -113,18 +181,57 @@ int main(int argc, char *argv[])
 
         // 解码时间
         cout << "pkt->dts = " << pkt->dts << endl;
+        AVCodecContext *cc = 0;
         if(pkt->stream_index == videoStream) {
             cout << "video: " << endl;
+            cc = vc;
         }
         if(pkt->stream_index == audioStream) {
             cout << "audio: " << endl;
+            cc = ac;
         }
 
+        /// 解码线程
+        // 发送packet到解码线程 send传NULL后多次调用receive取出所有缓冲帧
+        ret = avcodec_send_packet(cc, pkt);
+        // 释放，引用计数-1 为0释放空间
         av_packet_unref(pkt);
 
-//        XSleep(500);
+        if(ret != 0) {
+            char buf[1024] = {0};
+            av_strerror(ret, buf, sizeof(buf) - 1);
+            cout << "avcodec_send_packet failed" << buf << endl;
+            continue;
+        }
+
+        for(;;) {
+            // 从线程中获取解码接口，一次send可能对应多次receive
+            ret = avcodec_receive_frame(cc, frame);
+            if(ret != 0)
+                break;
+            cout << "recv frame " << frame->format << " " << frame->linesize[0] << endl;
+
+            // 视频
+            if(cc == vc) {
+                vctx = sws_getCachedContext(
+                            vctx, // 传NULL会新创建
+                            frame->width, frame->height, // 输入的宽高
+                            static_cast<AVPixelFormat>(frame->format), // 输出格式 YUV420P
+                            frame->width, frame->height, // 输出的宽高
+                            AV_PIX_FMT_RGBA, // 输出的格式RGBA
+                            SWS_BILINEAR, // 尺寸变化算法
+                            0, 0, 0
+                            );
+                if(vctx != NULL) {
+                    cout << "SwsContext create successfully" << endl;
+                }
+            }
+        }
+
+        XSleep(500);
     }
 
+    av_frame_free(&frame);
     av_packet_free(&pkt);
 
 
