@@ -12,7 +12,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(
+    Qt${QT_VERSION_MAJOR}
+    REQUIRED
+    COMPONENTS
+    Widgets
+)
+
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Multimedia)
 
 set(PROJECT_SOURCES
     main.cpp
@@ -56,7 +63,16 @@ find_library(AVCODEC avcodec ${PROJECT_SOURCE_DIR}/ffmpeg/lib)
 find_library(SWRESAMPLE swresample ${PROJECT_SOURCE_DIR}/ffmpeg/lib)
 
 
-target_link_libraries(VideoPlayer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${AVFORMAT} ${AVCODEC} ${AVUTIL} ${SWSCALE} ${SWRESAMPLE})
+target_link_libraries(
+    VideoPlayer
+    PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Multimedia
+    ${AVFORMAT}
+    ${AVCODEC}
+    ${AVUTIL}
+    ${SWSCALE}
+    ${SWRESAMPLE}
+)
 
 set_target_properties(VideoPlayer PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

@@ -3,6 +3,18 @@
 
 #include <QMainWindow>
 
+#include <iostream>
+#include <thread>
+using namespace std;
+
+extern "C" {
+#include "libavformat/avformat.h"
+#include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
+#include "libavutil/avutil.h"
+#include "libswresample/swresample.h"
+}
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -18,4 +30,7 @@ public:
 private:
     Ui::MainWindow *ui;
 };
+
+int running();
+
 #endif // MAINWINDOW_H
