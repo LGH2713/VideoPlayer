@@ -25,6 +25,17 @@ protected:
 private:
     // shader程序
     QOpenGLShaderProgram program;
+
+    // shader中的yuv地址
+    GLuint unis[3] = {0};
+    // opengl的texture地址
+    GLuint texs[3] = {0};
+
+    // 材质的内存空间
+    unsigned char *datas[3] = {0};
+
+    int width = 240;
+    int height = 128;
 };
 
 #endif // XVIDEOWIDGET_H

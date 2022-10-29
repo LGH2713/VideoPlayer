@@ -95,6 +95,43 @@ void XVideoWidget::initializeGL()
     // 材质
     glVertexAttribPointer(T_VER, 2, GL_FLOAT, 0, 0, tex);
     glEnableVertexAttribArray(T_VER);
+
+    // 从shader处获取材质
+    unis[0] = program.uniformLocation("tex_y");
+    unis[1] = program.uniformLocation("tex_u");
+    unis[2] = program.uniformLocation("tex_v");
+
+    // 创建材质
+    glGenTextures(3, texs);
+
+    // Y
+    glBindTexture(GL_TEXTURE_2D, texs[0]);
+    // 放大过滤，线性插值
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //创建材质显卡空间
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+
+    // U
+    glBindTexture(GL_TEXTURE_2D, texs[1]);
+    // 放大过滤，线性插值
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //创建材质显卡空间
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+
+    // V
+    glBindTexture(GL_TEXTURE_2D, texs[2]);
+    // 放大过滤，线性插值
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //创建材质显卡空间
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+
+    // 分配材质内存空间
+    datas[0] = new unsigned char[width * height]; // Y
+    datas[1] = new unsigned char[width * height / 4]; // U
+    datas[2] = new unsigned char[width * height / 4]; // V
 }
 
 void XVideoWidget::paintGL()
