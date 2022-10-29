@@ -11,8 +11,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    //    w.show();
+    w.show();
 
+    /*
     QMediaDevices *devices = new QMediaDevices();
     QAudioDevice device = devices->defaultAudioOutput();
 
@@ -45,6 +46,6 @@ int main(int argc, char *argv[])
     delete[] buf;
     buf = 0;
 
-
+    */
     return a.exec();
 }

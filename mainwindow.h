@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QOpenGLWidget>
 
 #include <iostream>
 #include <thread>
@@ -11,7 +12,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
-#include "libavutil/avutil.h"
+//#include "libavutil/avutil.h"
 #include "libswresample/swresample.h"
 }
 

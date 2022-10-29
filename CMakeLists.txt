@@ -21,11 +21,15 @@ find_package(
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Multimedia)
 
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS OpenGLWidgets)
+
 set(PROJECT_SOURCES
     main.cpp
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    XVideoWidget.cpp
+    XVideoWidget.h
 
 )
 
@@ -67,6 +71,7 @@ target_link_libraries(
     VideoPlayer
     PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt${QT_VERSION_MAJOR}::OpenGLWidgets
     ${AVFORMAT}
     ${AVCODEC}
     ${AVUTIL}
