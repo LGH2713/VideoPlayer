@@ -6,6 +6,8 @@
 #define A_VER 3
 #define T_VER 4
 
+FILE *fp = NULL;
+
 // 顶点shader
 const char *vString = GET_STR(
             attribute vec4 vertexIn;
@@ -83,9 +85,9 @@ void XVideoWidget::initializeGL()
     // 材质
     static const GLfloat tex[] = {
         0.0f, 1.0f,
-        1.0f, -1.0f,
-        -1.0f, 1.0f,
-        1.0f, 1.0f
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f
     };
 
     // 顶点
@@ -132,10 +134,50 @@ void XVideoWidget::initializeGL()
     datas[0] = new unsigned char[width * height]; // Y
     datas[1] = new unsigned char[width * height / 4]; // U
     datas[2] = new unsigned char[width * height / 4]; // V
+
+    fp = fopen("E:/out240x128.yuv", "rb");
+    if(!fp)
+        qDebug() << "out240x128.yuv open file failed!";
 }
 
 void XVideoWidget::paintGL()
 {
+    if(feof(fp))
+    {
+        fseek(fp, 0, SEEK_SET);
+    }
+    fread(datas[0], 1, width * height, fp);
+    fread(datas[1], 1, width * height / 4, fp);
+    fread(datas[2], 1, width * height / 4, fp);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texs[0]); // 0层绑定到Y材质
+    // 修改材质内容（复制内存内容）
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, datas[0]);
+    // 与shader uni遍历关联
+    glUniform1i(unis[0], 0);
+
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, texs[1]); // 1层绑定到U材质
+    // 修改材质内容（复制内存内容）
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width / 2, height / 2, GL_RED, GL_UNSIGNED_BYTE, datas[1]);
+    // 与shader uni遍历关联
+    glUniform1i(unis[1], 1);
+
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_2D, texs[2]); // 2层绑定到V材质
+    // 修改材质内容（复制内存内容）
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width / 2, height / 2, GL_RED, GL_UNSIGNED_BYTE, datas[2]);
+    // 与shader uni遍历关联
+    glUniform1i(unis[2], 2);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // 启动定时器
+    QTimer *ti = new QTimer(this);
+    connect(ti, SIGNAL(timeout()), this, SLOT(update()));
+    ti->start(40);
+
     qDebug() << "paintGL";
 }
 

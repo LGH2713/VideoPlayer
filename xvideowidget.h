@@ -4,6 +4,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
+#include <QTimer>
 
 class XVideoWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
