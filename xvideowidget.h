@@ -3,6 +3,7 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
 
 class XVideoWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -20,6 +21,10 @@ protected:
 
     // 窗口尺寸变化
     void resizeGL(int width, int height);
+
+private:
+    // shader程序
+    QOpenGLShaderProgram program;
 };
 
 #endif // XVIDEOWIDGET_H
