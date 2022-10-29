@@ -70,6 +70,31 @@ void XVideoWidget::initializeGL()
     // 编译shader
     qDebug() << "program.link() = " << program.link();
     qDebug() << "program.bind() = " << program.bind();
+
+    // 传递顶点坐标和材质坐标
+    // 顶点
+    static const GLfloat ver[] = {
+        -1.0f, -1.0f,
+        1.0f, -1.0f,
+        -1.0f, 1.0f,
+        1.0f, 1.0f
+    };
+
+    // 材质
+    static const GLfloat tex[] = {
+        0.0f, 1.0f,
+        1.0f, -1.0f,
+        -1.0f, 1.0f,
+        1.0f, 1.0f
+    };
+
+    // 顶点
+    glVertexAttribPointer(A_VER, 2, GL_FLOAT, 0, 0, ver);
+    glEnableVertexAttribArray(A_VER);
+
+    // 材质
+    glVertexAttribPointer(T_VER, 2, GL_FLOAT, 0, 0, tex);
+    glEnableVertexAttribArray(T_VER);
 }
 
 void XVideoWidget::paintGL()
