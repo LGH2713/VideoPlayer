@@ -3,6 +3,9 @@
 // 自动加双引号
 #define GET_STR(x) #x
 
+#define A_VER 3
+#define T_VER 4
+
 // 顶点shader
 const char *vString = GET_STR(
             attribute vec4 vertexIn;
@@ -57,6 +60,16 @@ void XVideoWidget::initializeGL()
     qDebug() << program.addShaderFromSourceCode(QOpenGLShader::Fragment, tString);
     // 顶点shader
     qDebug() << program.addShaderFromSourceCode(QOpenGLShader::Vertex, vString);
+
+    // 设置顶点坐标变量
+    program.bindAttributeLocation("vertexIn", A_VER);
+
+    // 设置材质坐标
+    program.bindAttributeLocation("textureIn", T_VER);
+
+    // 编译shader
+    qDebug() << "program.link() = " << program.link();
+    qDebug() << "program.bind() = " << program.bind();
 }
 
 void XVideoWidget::paintGL()
