@@ -36,6 +36,8 @@ set(PROJECT_SOURCES
     XResample.h
     XDemux.cpp
     XDemux.h
+    XDecode.cpp
+    XDecode.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
