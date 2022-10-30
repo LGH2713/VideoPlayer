@@ -6,6 +6,10 @@
 #define A_VER 3
 #define T_VER 4
 
+extern "C" {
+#include <libavutil/frame.h>
+}
+
 FILE *fp = NULL;
 
 // 顶点shader
@@ -100,6 +104,28 @@ void XVideoWidget::Init(int width, int height)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
 
     mux.unlock();
+}
+
+void XVideoWidget::Repaint(AVFrame *frame)
+{
+    if(!frame)
+        return;
+
+    mux.lock();
+    if(!datas[0] || width * height == 0 || frame->width != this->width || frame->height != this->height)
+    {
+        av_frame_free(&frame);
+        mux.unlock();
+        return;
+    }
+
+    memcpy(datas[0], frame->data[0], width * height);
+    memcpy(datas[1], frame->data[1], width * height / 4);
+    memcpy(datas[2], frame->data[2], width * height / 4);
+
+    mux.unlock();
+
+    update();
 }
 
 void XVideoWidget::initializeGL()

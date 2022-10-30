@@ -7,6 +7,8 @@
 #include <QTimer>
 #include <mutex>
 
+struct AVFrame;
+
 class XVideoWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -15,6 +17,9 @@ public:
     ~XVideoWidget();
 
     void Init(int width, int height);
+
+    // 不管成功与否都释放frame空间
+    virtual void Repaint(AVFrame *frame);
 
 protected:
     // 刷新显示
