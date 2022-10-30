@@ -212,3 +212,12 @@ void XDemux::Close()
 
     mux.unlock();
 }
+
+bool XDemux::IsAudio(AVPacket *pkt)
+{
+    if(!pkt)
+        return false;
+    if(pkt->stream_index == videoStream)
+        return false;
+    return true;
+}

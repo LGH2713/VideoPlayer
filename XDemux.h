@@ -27,6 +27,8 @@ public:
     // seek 位置 pos 0.0~1.0
     virtual bool Seek(double pos);
 
+    virtual bool IsAudio(AVPacket *pkt);
+
     // 清理和关闭函数
     virtual void Clear();
     virtual void Close();

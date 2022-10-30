@@ -39,12 +39,22 @@ int main(int argc, char *argv[])
     XDecode adecode;
     cout << "adecode.Open() = " << adecode.Open(demux.CopyAPara()) << endl;
 
-    //    for(;;)
-    //    {
-    //        AVPacket *pkt = demux.Read();
-    //        if(!pkt)
-    //            break;
-    //    }
+        for(;;)
+        {
+            AVPacket *pkt = demux.Read();
+            if(demux.IsAudio(pkt))
+            {
+                adecode.Send(pkt);
+                AVFrame *frame = adecode.Recv();
+            }
+            else
+            {
+                vdecode.Send(pkt);
+                AVFrame* frame = vdecode.Recv();
+            }
+            if(!pkt)
+                break;
+        }
 
     return a.exec();
 }

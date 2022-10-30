@@ -60,6 +60,50 @@ bool XDecode::Open(AVCodecParameters *para)
     return true;
 }
 
+bool XDecode::Send(AVPacket *pkt)
+{
+    // 容错处理
+    if(!pkt || pkt->size <= 0 || !pkt->data)
+        return false;
+    mux.lock();
+    if(!codec)
+    {
+        mux.unlock();
+        return false;
+    }
+    int ret = avcodec_send_packet(codec, pkt);
+    mux.unlock();
+    av_packet_free(&pkt);
+
+    if(ret != 0)
+        return false;
+
+    return true;
+}
+
+AVFrame *XDecode::Recv()
+{
+    mux.lock();
+    if(!codec)
+    {
+        mux.unlock();
+        return nullptr;
+    }
+
+    AVFrame *frame = av_frame_alloc();
+    int ret = avcodec_receive_frame(codec, frame);
+    mux.unlock();
+    if(ret != 0)
+    {
+        av_frame_free(&frame);
+        return nullptr;
+    }
+
+    cout << "[" << frame->linesize[0] << "]" << endl;
+
+    return frame;
+}
+
 void XDecode::Close()
 {
     mux.lock();
