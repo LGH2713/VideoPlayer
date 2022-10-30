@@ -22,12 +22,15 @@ int main(int argc, char *argv[])
 
     demux.Open(url);
 
-    for(;;)
-    {
-        AVPacket *pkt = demux.Read();
-        if(!pkt)
-            break;
-    }
+    cout << "CopyVPara = " << demux.CopyVPara() << endl;
+    cout << "CopyAPara = " << demux.CopyAPara() << endl;
+
+    //    for(;;)
+    //    {
+    //        AVPacket *pkt = demux.Read();
+    //        if(!pkt)
+    //            break;
+    //    }
 
     return a.exec();
 }

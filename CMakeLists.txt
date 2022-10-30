@@ -32,7 +32,10 @@ set(PROJECT_SOURCES
     mainwindow.ui
     XVideoWidget.cpp
     XVideoWidget.h
-
+    XResample.cpp
+    XResample.h
+    XDemux.cpp
+    XDemux.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

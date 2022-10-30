@@ -122,3 +122,37 @@ AVPacket *XDemux::Read()
 
     return pkt;
 }
+
+AVCodecParameters *XDemux::CopyVPara()
+{
+
+    mux.lock();
+    if(!ic)
+    {
+        mux.unlock();
+        return nullptr;
+    }
+    mux.unlock();
+    AVCodecParameters *pa = avcodec_parameters_alloc();
+    avcodec_parameters_copy(pa, ic->streams[videoStream]->codecpar);
+
+    mux.unlock();
+    return pa;
+    return nullptr;
+}
+
+AVCodecParameters *XDemux::CopyAPara()
+{
+    mux.lock();
+    if(!ic)
+    {
+        mux.unlock();
+        return nullptr;
+    }
+
+    AVCodecParameters *pa = avcodec_parameters_alloc();
+    avcodec_parameters_copy(pa, ic->streams[audioStream]->codecpar);
+
+    mux.unlock();
+    return pa;
+}
