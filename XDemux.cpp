@@ -2,6 +2,7 @@
 
 extern "C" {
 #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
 
 #include <mutex>
@@ -90,4 +91,34 @@ bool XDemux::Open(const char *url)
     mux.unlock();
 
     return true;
+}
+
+AVPacket *XDemux::Read()
+{
+    mux.lock();
+    if(!ic)
+    {
+        mux.unlock();
+        return nullptr;
+    }
+
+    // 读取一帧并分配空间
+    AVPacket *pkt = av_packet_alloc();
+    int ret = av_read_frame(ic, pkt);
+    if(ret != 0)
+    {
+        mux.unlock();
+        av_packet_free(&pkt);
+        return nullptr;
+    }
+
+    // pts,dts转换为毫秒
+    pkt->pts = pkt->pts * (1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
+    pkt->dts = pkt->dts * (1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
+
+    cout << "=================" << pkt->pts << flush;
+
+    mux.unlock();
+
+    return pkt;
 }

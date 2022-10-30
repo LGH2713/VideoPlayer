@@ -7,45 +7,27 @@
 #include <QAudioDevice>
 #include <QThread>
 
+#include "XDemux.h"
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
 
-    /*
-    QMediaDevices *devices = new QMediaDevices();
-    QAudioDevice device = devices->defaultAudioOutput();
 
-    QAudioFormat fmt = device.preferredFormat();
+    XDemux demux;
 
-    QAudioSink *audioSink = new QAudioSink(device, fmt);
+    const char* url = "E:/me.mp4";
 
-    QIODevice *io = audioSink->start();
+    demux.Open(url);
 
-    int size = 24;
-    char *buf = new char[size];
-
-    cout << size << endl;
-
-    FILE *fp = fopen("E:/out.pcm", "rb");
-    while(!feof(fp))
+    for(;;)
     {
-        if(audioSink->bufferSize() < size)
-        {
-            QThread::msleep(1);
-            continue;
-        }
-        int len = fread(buf, 1, size, fp);
-        if(len <= 0)
+        AVPacket *pkt = demux.Read();
+        if(!pkt)
             break;
-        io->write(buf,len);
     }
 
-    fclose(fp);
-    delete[] buf;
-    buf = 0;
-
-    */
     return a.exec();
 }

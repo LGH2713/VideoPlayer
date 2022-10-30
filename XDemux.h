@@ -2,6 +2,7 @@
 #define XDEMUX_H
 
 struct AVFormatContext;
+struct AVPacket;
 #include <mutex>
 
 
@@ -12,6 +13,9 @@ public:
 
     // 打开媒体文件，或者流媒体 rtmp http rstp
     virtual bool Open(const char *url);
+
+    // 空间需要调用者释放，释放AVPacket对象空间和数据空间 av_packet_free;
+    virtual AVPacket *Read();
 
     // 媒体总时长（毫秒）
     int totalMs = 0;
