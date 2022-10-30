@@ -30,6 +30,8 @@ XDemux::XDemux()
 
 bool XDemux::Open(const char *url)
 {
+    Close();
+
     //参数设置
     AVDictionary *opts = NULL;
     //设置rtsp流已tcp协议打开
@@ -155,4 +157,58 @@ AVCodecParameters *XDemux::CopyAPara()
 
     mux.unlock();
     return pa;
+}
+
+bool XDemux::Seek(double pos)
+{
+    mux.lock();
+    if(!ic)
+    {
+        mux.unlock();
+        return false;
+    }
+
+    // 清理读取缓冲
+    avformat_flush(ic);
+
+    long long seekPos = 0;
+    seekPos = ic->streams[videoStream]->duration * pos;
+    int ret = av_seek_frame(ic, videoStream, seekPos, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    mux.unlock();
+    if(ret < 0)
+        return false;
+
+    return true;
+}
+
+void XDemux::Clear()
+{
+    mux.lock();
+    if(!ic)
+    {
+        mux.unlock();
+        return;
+    }
+
+    // 清理读取缓冲
+    avformat_flush(ic);
+    mux.unlock();
+}
+
+void XDemux::Close()
+{
+    mux.lock();
+    if(!ic)
+    {
+        mux.unlock();
+        return;
+    }
+
+    // 清理读取缓冲
+    avformat_close_input(&ic);
+
+    // 清空总时长
+    totalMs = 0;
+
+    mux.unlock();
 }

@@ -21,9 +21,15 @@ int main(int argc, char *argv[])
     const char* url = "E:/me.mp4";
 
     demux.Open(url);
+    demux.Read();
+    demux.Clear();
+    demux.Close();
+
+    demux.Open(url);
 
     cout << "CopyVPara = " << demux.CopyVPara() << endl;
     cout << "CopyAPara = " << demux.CopyAPara() << endl;
+    cout << "seek = " << demux.Seek(0.95) << endl;
 
     //    for(;;)
     //    {
