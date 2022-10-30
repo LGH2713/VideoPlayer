@@ -9,14 +9,10 @@
 
 #include "XDemux.h"
 #include "XDecode.h"
+#include "ui_mainwindow.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-
-
     XDemux demux;
 
     const char* url = "E:/me.mp4";
@@ -39,22 +35,28 @@ int main(int argc, char *argv[])
     XDecode adecode;
     cout << "adecode.Open() = " << adecode.Open(demux.CopyAPara()) << endl;
 
-        for(;;)
-        {
-            AVPacket *pkt = demux.Read();
-            if(demux.IsAudio(pkt))
-            {
-                adecode.Send(pkt);
-                AVFrame *frame = adecode.Recv();
-            }
-            else
-            {
-                vdecode.Send(pkt);
-                AVFrame* frame = vdecode.Recv();
-            }
-            if(!pkt)
-                break;
-        }
+    //    for(;;)
+    //    {
+    //        AVPacket *pkt = demux.Read();
+    //        if(demux.IsAudio(pkt))
+    //        {
+    //            adecode.Send(pkt);
+    //            AVFrame *frame = adecode.Recv();
+    //        }
+    //        else
+    //        {
+    //            vdecode.Send(pkt);
+    //            AVFrame* frame = vdecode.Recv();
+    //        }
+    //        if(!pkt)
+    //            break;
+    //    }
+
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+
+    w.ui->video->Init(demux.width, demux.height);
 
     return a.exec();
 }

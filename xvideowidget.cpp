@@ -50,9 +50,63 @@ XVideoWidget::~XVideoWidget()
 
 }
 
+void XVideoWidget::Init(int width, int height)
+{
+    mux.lock();
+
+    this->width = width;
+    this->height = height;
+
+    delete datas[0];
+    delete datas[1];
+    delete datas[2];
+
+    // 分配材质内存空间
+    datas[0] = new unsigned char[width * height];     // Y
+    datas[1] = new unsigned char[width * height / 4]; // U
+    datas[2] = new unsigned char[width * height / 4]; // V
+
+    // 清理材质
+    if(texs[0])
+    {
+        glDeleteTextures(3, texs);
+    }
+
+    // 创建材质
+    glGenTextures(3, texs);
+
+    // Y
+    glBindTexture(GL_TEXTURE_2D, texs[0]);
+    // 放大过滤，线性插值
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //创建材质显卡空间
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+
+    // U
+    glBindTexture(GL_TEXTURE_2D, texs[1]);
+    // 放大过滤，线性插值
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //创建材质显卡空间
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+
+    // V
+    glBindTexture(GL_TEXTURE_2D, texs[2]);
+    // 放大过滤，线性插值
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //创建材质显卡空间
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+
+    mux.unlock();
+}
+
 void XVideoWidget::initializeGL()
 {
     qDebug() << "initializeGL";
+
+    mux.lock();
 
     // 初始化openGL函数
     initializeOpenGLFunctions();
@@ -103,52 +157,30 @@ void XVideoWidget::initializeGL()
     unis[1] = program.uniformLocation("tex_u");
     unis[2] = program.uniformLocation("tex_v");
 
-    // 创建材质
-    glGenTextures(3, texs);
+    mux.unlock();
 
-    // Y
-    glBindTexture(GL_TEXTURE_2D, texs[0]);
-    // 放大过滤，线性插值
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //创建材质显卡空间
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
 
-    // U
-    glBindTexture(GL_TEXTURE_2D, texs[1]);
-    // 放大过滤，线性插值
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //创建材质显卡空间
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    //    fp = fopen("E:/out240x128.yuv", "rb");
+    //    if(!fp)
+    //        qDebug() << "out240x128.yuv open file failed!";
 
-    // V
-    glBindTexture(GL_TEXTURE_2D, texs[2]);
-    // 放大过滤，线性插值
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //创建材质显卡空间
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
-
-    // 分配材质内存空间
-    datas[0] = new unsigned char[width * height]; // Y
-    datas[1] = new unsigned char[width * height / 4]; // U
-    datas[2] = new unsigned char[width * height / 4]; // V
-
-    fp = fopen("E:/out240x128.yuv", "rb");
-    if(!fp)
-        qDebug() << "out240x128.yuv open file failed!";
+    //    // 启动定时器
+    //    QTimer *ti = new QTimer(this);
+    //    connect(ti, SIGNAL(timeout()), this, SLOT(update()));
+    //    ti->start(10);
 }
 
 void XVideoWidget::paintGL()
 {
-    if(feof(fp))
-    {
-        fseek(fp, 0, SEEK_SET);
-    }
-    fread(datas[0], 1, width * height, fp);
-    fread(datas[1], 1, width * height / 4, fp);
-    fread(datas[2], 1, width * height / 4, fp);
+    //    if(feof(fp))
+    //    {
+    //        fseek(fp, 0, SEEK_SET);
+    //    }
+    //    fread(datas[0], 1, width * height, fp);
+    //    fread(datas[1], 1, width * height / 4, fp);
+    //    fread(datas[2], 1, width * height / 4, fp);
+
+    mux.lock();
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texs[0]); // 0层绑定到Y材质
@@ -173,10 +205,7 @@ void XVideoWidget::paintGL()
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    // 启动定时器
-    QTimer *ti = new QTimer(this);
-    connect(ti, SIGNAL(timeout()), this, SLOT(update()));
-    ti->start(40);
+    mux.unlock();
 
     qDebug() << "paintGL";
 }

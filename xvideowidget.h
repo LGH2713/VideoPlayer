@@ -5,6 +5,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QTimer>
+#include <mutex>
 
 class XVideoWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -12,6 +13,8 @@ class XVideoWidget : public QOpenGLWidget, protected QOpenGLFunctions
 public:
     XVideoWidget(QWidget *parent);
     ~XVideoWidget();
+
+    void Init(int width, int height);
 
 protected:
     // 刷新显示
@@ -26,6 +29,8 @@ protected:
 private:
     // shader程序
     QOpenGLShaderProgram program;
+
+    std::mutex mux;
 
     // shader中的yuv地址
     GLuint unis[3] = {0};
