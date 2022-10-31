@@ -14,7 +14,16 @@ class XDemuxThread: public QThread
 public:
     XDemuxThread();
     ~XDemuxThread();
+
+    // 创建对象并打开
      virtual bool Open(const char *url, IVideoCall *call);
+
+    // 开启所有线程
+    virtual void Start();
+
+    void run();
+
+    bool isExit = false;
 
 protected:
     std::mutex mux;

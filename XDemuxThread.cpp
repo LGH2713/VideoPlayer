@@ -13,7 +13,8 @@ XDemuxThread::XDemuxThread()
 
 XDemuxThread::~XDemuxThread()
 {
-
+    isExit = true;
+    wait();
 }
 
 bool XDemuxThread::Open(const char *url, IVideoCall *call)
@@ -54,4 +55,50 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
     mux.unlock();
     cout << "XDemucThread::Open seccess!" << endl;
     return ret;
+}
+
+void XDemuxThread::Start()
+{
+    mux.lock();
+
+    QThread::start();
+    if(vt) vt->start();
+    if(at) at->start();
+
+    mux.unlock();
+}
+
+void XDemuxThread::run()
+{
+    while(!isExit)
+    {
+        mux.lock();
+        if(!demux)
+        {
+            mux.unlock();
+            msleep(5);
+            continue;
+        }
+
+        AVPacket *pkt = demux->Read();
+        if (!pkt)
+        {
+            mux.unlock();
+            msleep(5);
+            continue;
+        }
+
+        // 判断数据是音频
+        if(demux->IsAudio(pkt))
+        {
+            if(at) at->Push(pkt);
+        }
+        else // 视频
+        {
+            if(vt) vt->Push(pkt);
+            msleep(10);
+        }
+
+        mux.unlock();
+    }
 }

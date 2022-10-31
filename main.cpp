@@ -7,10 +7,11 @@
 #include <QAudioDevice>
 #include <QThread>
 
+#include "ui_mainwindow.h"
 #include "XDemux.h"
 #include "XAudioThread.h"
-#include "ui_mainwindow.h"
 #include "XVideoThread.h"
+#include "XDemuxThread.h"
 
 class TestThread: public QThread
 {
@@ -79,7 +80,7 @@ public:
                 //          vdecode.Send(pkt);
                 //            AVFrame* frame = vdecode.Recv();
                 //              video->Repaint(frame);
-                // msleep(40);
+                 msleep(1);
             }
             if(!pkt)
                 break;
@@ -103,15 +104,19 @@ public:
 int main(int argc, char *argv[])
 {
 
-    TestThread tt;
+    // TestThread tt;
 
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
 
-    tt.video = w.ui->video;
-    tt.Init();
-    tt.start();
+    //tt.video = w.ui->video;
+    //tt.Init();
+    //tt.start();
+
+    XDemuxThread dt;
+    dt.Open("E:/loneyRock.mp4", w.ui->video);
+    dt.Start();
 
     return a.exec();
 }
