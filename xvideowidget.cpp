@@ -125,6 +125,7 @@ void XVideoWidget::Repaint(AVFrame *frame)
 
     mux.unlock();
 
+    av_frame_free(&frame);
     update();
 }
 

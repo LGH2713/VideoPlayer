@@ -99,7 +99,7 @@ AVFrame *XDecode::Recv()
         return nullptr;
     }
 
-    cout << "[" << frame->linesize[0] << "]" << endl;
+//    cout << "[" << frame->linesize[0] << "]" << endl;
 
     return frame;
 }

@@ -42,6 +42,11 @@ set(PROJECT_SOURCES
     XAudioPlay.h
     XAudioThread.cpp
     XAudioThread.h
+    XVideoThread.cpp
+    XVideoThread.h
+    IVideoCall.h
+    XDemuxThread.cpp
+    XDemuxThread.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

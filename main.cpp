@@ -8,18 +8,16 @@
 #include <QThread>
 
 #include "XDemux.h"
-#include "XDecode.h"
-#include "XResample.h"
-#include "XAudioPlay.h"
 #include "XAudioThread.h"
 #include "ui_mainwindow.h"
+#include "XVideoThread.h"
 
 class TestThread: public QThread
 {
 public:
     void Init()
     {
-        const char* url = "E:/loneyRock.mp4";
+        const char* url = "E:/rainSun.mp4";
 
         demux.Open(url);
         demux.Read();
@@ -28,11 +26,11 @@ public:
 
         demux.Open(url);
 
-        cout << "CopyVPara = " << demux.CopyVPara() << endl;
-        cout << "CopyAPara = " << demux.CopyAPara() << endl;
+        //        cout << "CopyVPara = " << demux.CopyVPara() << endl;
+        //        cout << "CopyAPara = " << demux.CopyAPara() << endl;
         //        cout << "seek = " << demux.Seek(0.95) << endl;
 
-        cout << "vdecode.Open() = " << vdecode.Open(demux.CopyVPara()) << endl;
+        //        cout << "vdecode.Open() = " << vdecode.Open(demux.CopyVPara()) << endl;
         //        vdecode.Clear();
         //        vdecode.Close();
 
@@ -44,7 +42,9 @@ public:
         //        cout << "XAudioPlay::Get()->Open() = " << XAudioPlay::Get()->Open() << endl;
 
         cout << "at.Open() = " << at.Open(demux.CopyAPara()) << endl;
+        cout << "vt.Open() = " << vt.Open(demux.CopyVPara(), video, demux.width, demux.height);
         at.start();
+        vt.start();
     }
 
     unsigned char *pcm = new unsigned char[1024 * 1024];
@@ -75,9 +75,10 @@ public:
             }
             else
             {
-                vdecode.Send(pkt);
-                AVFrame* frame = vdecode.Recv();
-                video->Repaint(frame);
+                vt.Push(pkt);
+                //          vdecode.Send(pkt);
+                //            AVFrame* frame = vdecode.Recv();
+                //              video->Repaint(frame);
                 // msleep(40);
             }
             if(!pkt)
@@ -88,28 +89,28 @@ public:
     // 测试demux
     XDemux demux;
     // 解码测试
-    XDecode adecode;
-    XDecode vdecode;
+    // XDecode adecode;
+    // XDecode vdecode;
 
-    XResample resample;
+    // XResample resample;
 
-    XVideoWidget *video;
+    XVideoWidget *video = 0;
 
     XAudioThread at;
+    XVideoThread vt;
 };
 
 int main(int argc, char *argv[])
 {
 
     TestThread tt;
-    tt.Init();
 
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
 
-    w.ui->video->Init(tt.demux.width, tt.demux.height);
     tt.video = w.ui->video;
+    tt.Init();
     tt.start();
 
     return a.exec();

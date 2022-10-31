@@ -124,8 +124,6 @@ AVPacket *XDemux::Read()
     pkt->pts = pkt->pts * (1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
     pkt->dts = pkt->dts * (1000 * (r2d(ic->streams[pkt->stream_index]->time_base)));
 
-    cout << "=================" << pkt->pts << flush;
-
     mux.unlock();
 
     return pkt;
