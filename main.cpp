@@ -11,6 +11,7 @@
 #include "XDecode.h"
 #include "XResample.h"
 #include "XAudioPlay.h"
+#include "XAudioThread.h"
 #include "ui_mainwindow.h"
 
 class TestThread: public QThread
@@ -29,18 +30,21 @@ public:
 
         cout << "CopyVPara = " << demux.CopyVPara() << endl;
         cout << "CopyAPara = " << demux.CopyAPara() << endl;
-//        cout << "seek = " << demux.Seek(0.95) << endl;
+        //        cout << "seek = " << demux.Seek(0.95) << endl;
 
         cout << "vdecode.Open() = " << vdecode.Open(demux.CopyVPara()) << endl;
         //        vdecode.Clear();
         //        vdecode.Close();
 
-        cout << "adecode.Open() = " << adecode.Open(demux.CopyAPara()) << endl;
-        cout << "resample.Open() = " << resample.Open(demux.CopyAPara()) << endl;
+        //        cout << "adecode.Open() = " << adecode.Open(demux.CopyAPara()) << endl;
+        //        cout << "resample.Open() = " << resample.Open(demux.CopyAPara()) << endl;
 
-        XAudioPlay::Get()->sampleRate = demux.sampleRate;
-        XAudioPlay::Get()->channels = demux.channels;
-        cout << "XAudioPlay::Get()->Open() = " << XAudioPlay::Get()->Open() << endl;
+        //        XAudioPlay::Get()->sampleRate = demux.sampleRate;
+        //        XAudioPlay::Get()->channels = demux.channels;
+        //        cout << "XAudioPlay::Get()->Open() = " << XAudioPlay::Get()->Open() << endl;
+
+        cout << "at.Open() = " << at.Open(demux.CopyAPara()) << endl;
+        at.start();
     }
 
     unsigned char *pcm = new unsigned char[1024 * 1024];
@@ -51,6 +55,8 @@ public:
             AVPacket *pkt = demux.Read();
             if(demux.IsAudio(pkt))
             {
+                at.Push(pkt);
+                /*
                 adecode.Send(pkt);
                 AVFrame *frame = adecode.Recv();
                 int len = resample.Resample(frame, pcm);
@@ -64,6 +70,7 @@ public:
                     }
                     msleep(1);
                 }
+                */
 
             }
             else
@@ -87,6 +94,8 @@ public:
     XResample resample;
 
     XVideoWidget *video;
+
+    XAudioThread at;
 };
 
 int main(int argc, char *argv[])
