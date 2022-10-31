@@ -1,5 +1,8 @@
 #include "XResample.h"
-
+extern "C" {
+#include <libswresample/swresample.h>
+#include <libavcodec//avcodec.h>
+}
 
 using namespace std;
 
@@ -29,18 +32,20 @@ bool XResample::Open(AVCodecParameters *para)
                 para->sample_rate,    // 输入采样率
                 0, 0
                 );
+
+    avcodec_parameters_free(&para);
+
     if(ret != 0) {
+        mux.unlock();
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf) - 1);
         cout << "swr_alloc_set_opts2 failed!" << endl;
-        getchar();
-        return -1;
+        return false;
     }
 
     cout << "swr_alloc_set_opts2 success " << ret << endl;
 
     ret = swr_init(actx);
-
     mux.unlock();
 
     if(ret != 0) {
@@ -76,9 +81,9 @@ int XResample::Resample(AVFrame *indata, unsigned char *d)
     uint8_t *data[2] = {0};
     data[0] = d;
     int ret = swr_convert(actx,
-                      data, indata->nb_samples,
-                      const_cast<const uint8_t**>(indata->data), indata->nb_samples
-                      );
+                          data, indata->nb_samples,
+                          const_cast<const uint8_t**>(indata->data), indata->nb_samples
+                          );
 
     if(ret < 0)
         return ret;

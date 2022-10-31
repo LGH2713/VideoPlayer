@@ -1,14 +1,13 @@
 #ifndef XRESAMPLE_H
 #define XRESAMPLE_H
 struct AVCodecParameters;
+struct AVFrame;
+struct SwrContext;
 
 #include <mutex>
 #include <iostream>
 
-extern "C" {
-#include <libswresample/swresample.h>
-#include <libavcodec//avcodec.h>
-}
+
 
 class XResample
 {
