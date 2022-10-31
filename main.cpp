@@ -18,7 +18,7 @@ class TestThread: public QThread
 public:
     void Init()
     {
-        const char* url = "E:/rainSun.mp4";
+        const char* url = "E:/loneyRock.mp4";
 
         demux.Open(url);
         demux.Read();

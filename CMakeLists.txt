@@ -40,6 +40,8 @@ set(PROJECT_SOURCES
     XDecode.h
     XAudioPlay.cpp
     XAudioPlay.h
+    XAudioThread.cpp
+    XAudioThread.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

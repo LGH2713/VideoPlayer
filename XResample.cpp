@@ -11,7 +11,7 @@ XResample::XResample()
 
 }
 
-bool XResample::Open(AVCodecParameters *para)
+bool XResample::Open(AVCodecParameters *para, bool isClearPara)
 {
     if(!para)
         return false;
@@ -33,7 +33,8 @@ bool XResample::Open(AVCodecParameters *para)
                 0, 0
                 );
 
-    avcodec_parameters_free(&para);
+    if(isClearPara)
+        avcodec_parameters_free(&para);
 
     if(ret != 0) {
         mux.unlock();

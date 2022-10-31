@@ -15,7 +15,7 @@ public:
     XResample();
 
     // 输出参数和输入参数一致除了采样格式，输出为S16
-    virtual bool Open(AVCodecParameters *para);
+    virtual bool Open(AVCodecParameters *para, bool isClearPara = false);
 
     virtual void Close();
 
