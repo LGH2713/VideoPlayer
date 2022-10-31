@@ -13,7 +13,9 @@ XAudioThread::XAudioThread()
 
 XAudioThread::~XAudioThread()
 {
-
+    // 等待线程退出
+    isExit = true;
+    wait();
 }
 
 void XAudioThread::run()
@@ -59,4 +61,23 @@ bool XAudioThread::Open(AVCodecParameters *para)
 
     mux.unlock();
     return ret;
+}
+
+void XAudioThread::Push(AVPacket *pkt)
+{
+    if(!pkt)
+        return;
+
+    while(!isExit)
+    {
+        mux.lock();
+        if(packs.size() < maxList)
+        {
+            packs.push_back(pkt);
+            mux.unlock();
+            break;
+        }
+        mux.unlock();
+        msleep(1);
+    }
 }
