@@ -48,6 +48,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
         cout << "at->Open() failed!" << endl;
     }
 
+    totalMs = demux->totalMs;
     mux.unlock();
     cout << "XDemucThread::Open seccess!" << endl;
     return ret;
@@ -98,6 +99,7 @@ void XDemuxThread::run()
         // 音视频同步
         if(vt && at)
         {
+            pts = at->pts;
             vt->synpts = at->pts;
         }
 

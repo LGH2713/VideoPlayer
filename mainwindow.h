@@ -28,6 +28,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    // 定时器 滑动条显示
+    void timerEvent(QTimerEvent *e);
+
 private:
     Ui::MainWindow *ui;
 

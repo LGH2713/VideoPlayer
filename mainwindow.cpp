@@ -12,12 +12,24 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     dt.Start();
+    startTimer(40);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     dt.Close();
+}
+
+void MainWindow::timerEvent(QTimerEvent *e)
+{
+    long long total = dt.totalMs;
+    if(total > 0)
+    {
+        double pos = static_cast<double>(dt.pts) / static_cast<double>(total);
+        int v = ui->playPos->maximum() * pos;
+        ui->playPos->setValue(v);
+    }
 }
 
 void MainWindow::on_openFile_clicked()

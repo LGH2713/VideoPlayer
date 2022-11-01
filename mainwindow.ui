@@ -26,11 +26,24 @@
      </widget>
     </item>
    </layout>
+   <widget class="QSlider" name="playPos">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>610</y>
+      <width>1041</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
    <widget class="QPushButton" name="openFile">
     <property name="geometry">
      <rect>
-      <x>970</x>
-      <y>580</y>
+      <x>30</x>
+      <y>30</y>
       <width>80</width>
       <height>29</height>
      </rect>
@@ -41,6 +54,7 @@
    </widget>
    <zorder>video</zorder>
    <zorder>openFile</zorder>
+   <zorder>playPos</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
