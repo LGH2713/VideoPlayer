@@ -80,6 +80,32 @@ public:
         mux.unlock();
         return freeSize;
     }
+
+    virtual long long GetNoPlayMs()
+    {
+        mux.lock();
+        if(!output)
+        {
+            mux.unlock();
+            return 0;
+        }
+
+        long long pts = 0;
+        // 还未播放的字节数
+        double size = output->bufferSize() - output->bytesFree();
+        // 一毫秒音频字节大小
+        double secSize = output->format().bytesForDuration(1000);
+        if(secSize <= 0)
+        {
+            pts = 0;
+        }
+        else
+        {
+            pts = (size / secSize);
+        }
+        mux.unlock();
+        return pts;
+    }
 };
 
 XAudioPlay::XAudioPlay()

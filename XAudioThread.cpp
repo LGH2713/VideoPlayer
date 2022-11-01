@@ -49,6 +49,10 @@ void XAudioThread::run()
             AVFrame *frame = decode->Recv();
             if(!frame)
                 break;
+
+            // 减去缓冲中未播放的时间
+            pts = decode->pts - ap->GetNoPlayMs();
+            cout << "audio thread pts = " << pts << endl;
             // 重采样
             int size = res->Resample(frame, pcm);
             // 播放音频
@@ -83,6 +87,8 @@ bool XAudioThread::Open(AVCodecParameters *para)
     if(!decode) decode = new XDecode();
     if(!res) res = new XResample();
     if(!ap) ap = XAudioPlay::Get();
+
+    pts = 0;
 
     bool ret = true;
     if(!res->Open(para, false))

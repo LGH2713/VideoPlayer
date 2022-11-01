@@ -14,6 +14,10 @@ public:
     XDecode();
 
     bool isAudio = false;
+
+    // 当前解码到的pts
+    long long pts = 0;
+
     // 打开解码器 并释放para空间
     virtual bool Open(AVCodecParameters *para);
 

@@ -101,6 +101,8 @@ AVFrame *XDecode::Recv()
 
 //    cout << "[" << frame->linesize[0] << "]" << endl;
 
+    // 记录取到的pts
+    pts = frame->pts;
     return frame;
 }
 
@@ -112,6 +114,7 @@ void XDecode::Close()
         avcodec_close(codec);
         avcodec_free_context(&codec);
     }
+    pts = 0;
     mux.unlock();
 }
 
