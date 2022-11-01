@@ -22,6 +22,7 @@ bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, in
         return false;
 
     mux.lock();
+    synpts = 0;
 
     // 初始化显示窗口
     this->call = call;
@@ -73,6 +74,14 @@ void XVideoThread::run()
 
         // 没有数据
         if(packs.empty() || !decode)
+        {
+            mux.unlock();
+            msleep(1);
+            continue;
+        }
+
+        // 音视频同步
+        if(synpts < decode->pts)
         {
             mux.unlock();
             msleep(1);

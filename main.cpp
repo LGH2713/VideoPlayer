@@ -117,6 +117,7 @@ int main(int argc, char *argv[])
     XDemuxThread dt;
     dt.Open("E:/loneyRock.mp4", w.ui->video);
 //    dt.Open("rtmp://ns8.indexforce.com/home/mystream", w.ui->video);
+//    dt.Open("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mp4", w.ui->video);
     dt.Start();
 
     return a.exec();

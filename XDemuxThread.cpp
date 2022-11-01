@@ -80,6 +80,12 @@ void XDemuxThread::run()
             continue;
         }
 
+        // 音视频同步
+        if(vt && at)
+        {
+            vt->synpts = at->pts;
+        }
+
         AVPacket *pkt = demux->Read();
         if (!pkt)
         {
