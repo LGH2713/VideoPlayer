@@ -1,11 +1,17 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <QFileDialog>
+#include <XDemuxThread.h>
+#include <QMessageBox>
+
+static XDemuxThread dt;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    dt.Start();
 }
 
 MainWindow::~MainWindow()
@@ -13,11 +19,18 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-static double r2d(AVRational r) {
-    return r.den == 0 ? 0 : static_cast<double>(r.num) / static_cast<double>(r.den);
+void MainWindow::on_openFile_clicked()
+{
+    QString name = QFileDialog::getOpenFileName(this, QString::fromLocal8Bit("选择视频文件"));
+    if(name.isEmpty())
+        return ;
+
+    this->setWindowTitle(name);
+
+    if(!dt.Open(name.toLocal8Bit(), this->ui->video))
+    {
+        QMessageBox::information(0, "error", "open file filed!");
+        return ;
+    }
 }
 
-void XSleep(int ms) {
-    chrono::milliseconds du(ms);
-    this_thread::sleep_for(du);
-}

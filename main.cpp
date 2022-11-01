@@ -80,7 +80,7 @@ public:
                 //          vdecode.Send(pkt);
                 //            AVFrame* frame = vdecode.Recv();
                 //              video->Repaint(frame);
-                 msleep(1);
+                msleep(1);
             }
             if(!pkt)
                 break;
@@ -114,11 +114,11 @@ int main(int argc, char *argv[])
     //tt.Init();
     //tt.start();
 
-    XDemuxThread dt;
-    dt.Open("E:/loneyRock.mp4", w.ui->video);
-//    dt.Open("rtmp://ns8.indexforce.com/home/mystream", w.ui->video);
-//    dt.Open("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mp4", w.ui->video);
-    dt.Start();
+    //XDemuxThread dt;
+    // dt.Open("E:/loneyRock.mp4", w.ui->video);
+    //    dt.Open("rtmp://ns8.indexforce.com/home/mystream", w.ui->video);
+    //    dt.Open("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mp4", w.ui->video);
+    //dt.Start();
 
     return a.exec();
 }

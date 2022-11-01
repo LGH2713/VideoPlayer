@@ -28,8 +28,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-//private:
+private:
     Ui::MainWindow *ui;
+
+private slots:
+    void on_openFile_clicked();
 };
 
 int running();

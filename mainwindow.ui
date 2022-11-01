@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>899</width>
-    <height>679</height>
+    <width>1111</width>
+    <height>708</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,28 +26,28 @@
      </widget>
     </item>
    </layout>
-   <widget class="QSlider" name="horizontalSlider">
+   <widget class="QPushButton" name="openFile">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>570</y>
-      <width>771</width>
-      <height>18</height>
+      <x>970</x>
+      <y>580</y>
+      <width>80</width>
+      <height>29</height>
      </rect>
     </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
+    <property name="text">
+     <string>打开文件</string>
     </property>
    </widget>
    <zorder>video</zorder>
-   <zorder>horizontalSlider</zorder>
+   <zorder>openFile</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>899</width>
+     <width>1111</width>
      <height>25</height>
     </rect>
    </property>
