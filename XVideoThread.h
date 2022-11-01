@@ -12,7 +12,9 @@ struct AVCodecParameters;
 #include <mutex>
 #include <QThread>
 
-class XVideoThread: public QThread
+#include "XDecodeThread.h"
+
+class XVideoThread: public XDecodeThread
 {
 public:
     XVideoThread();
@@ -20,7 +22,6 @@ public:
 
     // 打开，不管成功与否都清理
     virtual bool Open(AVCodecParameters *para, IVideoCall *call, int width, int height);
-    virtual void Push(AVPacket *pkt);
     void run();
 
     //最大队列
@@ -30,9 +31,7 @@ public:
     long long synpts = 0;
 
 protected:
-    std::list <AVPacket *> packs;
-    std::mutex mux;
-    XDecode *decode = 0;
+    std::mutex vmux;
     IVideoCall *call = 0;
 };
 

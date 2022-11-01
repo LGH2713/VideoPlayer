@@ -11,9 +11,7 @@ XVideoThread::XVideoThread()
 
 XVideoThread::~XVideoThread()
 {
-    // 等待线程退出
-    isExit = true;
-    wait();
+
 }
 
 bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, int height)
@@ -21,7 +19,7 @@ bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, in
     if(!para)
         return false;
 
-    mux.lock();
+    vmux.lock();
     synpts = 0;
 
     // 初始化显示窗口
@@ -31,8 +29,8 @@ bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, in
         call->Init(width, height);
     }
 
-    // 打开解码器
-    if(!decode) decode = new XDecode();
+    vmux.unlock();
+
     bool ret = true;
     if(!decode->Open(para))
     {
@@ -40,60 +38,39 @@ bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, in
         ret = false;
     }
 
-    mux.unlock();
-
     cout << "XAudioThread::Open = " << ret << endl;
     return ret;
-}
-
-void XVideoThread::Push(AVPacket *pkt)
-{
-
-    if(!pkt)
-        return;
-
-    while(!isExit)
-    {
-        mux.lock();
-        if(packs.size() < maxList)
-        {
-            packs.push_back(pkt);
-            mux.unlock();
-            break;
-        }
-        mux.unlock();
-        msleep(1);
-    }
 }
 
 void XVideoThread::run()
 {
     while(!isExit)
     {
-        mux.lock();
-
-        // 没有数据
-        if(packs.empty() || !decode)
-        {
-            mux.unlock();
-            msleep(1);
-            continue;
-        }
+        vmux.lock();
 
         // 音视频同步
-        if(synpts < decode->pts)
+        if(synpts > 0 && synpts < decode->pts)
         {
-            mux.unlock();
+            vmux.unlock();
             msleep(1);
             continue;
         }
 
-        AVPacket *pkt = packs.front();
-        packs.pop_front();
+//        // 没有数据
+//        if(packs.empty() || !decode)
+//        {
+//            vmux.unlock();
+//            msleep(1);
+//            continue;
+//        }
+
+//        AVPacket *pkt = packs.front();
+//        packs.pop_front();
+        AVPacket *pkt = Pop();
         bool ret = decode->Send(pkt);
         if(!ret)
         {
-            mux.unlock();
+            vmux.unlock();
             msleep(1);
             continue;
         }
@@ -112,6 +89,6 @@ void XVideoThread::run()
             }
 
         }
-        mux.unlock();
+        vmux.unlock();
     }
 }

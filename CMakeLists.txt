@@ -47,6 +47,8 @@ set(PROJECT_SOURCES
     IVideoCall.h
     XDemuxThread.cpp
     XDemuxThread.h
+    XDecodeThread.cpp
+    XDecodeThread.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
