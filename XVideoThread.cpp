@@ -19,6 +19,8 @@ bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, in
     if(!para)
         return false;
 
+    Clear();
+
     vmux.lock();
     synpts = 0;
 

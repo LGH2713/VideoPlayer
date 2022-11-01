@@ -8,6 +8,8 @@ struct AVFrame;
 
 #include <mutex>
 
+extern void XFreePacket(AVPacket **pkt);
+
 class XDecode
 {
 public:

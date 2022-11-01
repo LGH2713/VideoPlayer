@@ -83,6 +83,8 @@ bool XAudioThread::Open(AVCodecParameters *para)
     if(!para)
         return false;
 
+    Clear();
+
     amux.lock();
 
     pts = 0;

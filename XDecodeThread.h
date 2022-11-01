@@ -17,6 +17,7 @@ public:
     virtual void Push(AVPacket *pkt);
     // 取出一帧数据，并出栈，如果没有则返回nullptr
     virtual AVPacket *Pop();
+    virtual void Clear();
 
     //最大队列
     int maxList = 100;

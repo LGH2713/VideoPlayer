@@ -6,6 +6,14 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
+void XFreePacket(AVPacket **pkt)
+{
+    if(!pkt || !(*pkt))
+        return;
+    av_packet_free(pkt);
+}
+
+
 XDecode::XDecode()
 {
 
