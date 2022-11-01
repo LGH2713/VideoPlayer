@@ -21,6 +21,9 @@ public:
     // 开启所有线程
     virtual void Start();
 
+    // 关闭线程，清理资源
+    virtual void Close();
+
     void run();
 
     bool isExit = false;

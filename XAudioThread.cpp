@@ -117,3 +117,23 @@ bool XAudioThread::Open(AVCodecParameters *para)
     amux.unlock();
     return ret;
 }
+
+void XAudioThread::Close()
+{
+    XDecodeThread::Close();
+    if(res)
+    {
+        res->Close();
+        amux.lock();
+        res = nullptr;
+        amux.unlock();
+    }
+
+    if(ap)
+    {
+        ap->Close();
+        amux.lock();
+        ap = nullptr;
+        amux.unlock();
+    }
+}

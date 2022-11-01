@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    dt.Close();
 }
 
 void MainWindow::on_openFile_clicked()

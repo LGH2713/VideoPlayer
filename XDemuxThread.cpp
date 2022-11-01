@@ -69,6 +69,20 @@ void XDemuxThread::Start()
     mux.unlock();
 }
 
+void XDemuxThread::Close()
+{
+    isExit = true;
+    wait();
+    if(vt) vt->Close();
+    if(at) at->Close();
+    mux.lock();
+    delete vt;
+    delete at;
+    vt = nullptr;
+    at = nullptr;
+    mux.unlock();
+}
+
 void XDemuxThread::run()
 {
     while(!isExit)

@@ -19,6 +19,9 @@ public:
     void run();
     virtual bool Open(AVCodecParameters *para);
 
+    // 停止线程，清理资源
+    virtual void Close();
+
     // 当前音频播放的pts
     long long pts = 0;
 
