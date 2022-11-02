@@ -24,6 +24,13 @@ void XAudioThread::run()
     {
         amux.lock();
 
+        if(isPause)
+        {
+            amux.unlock();
+            msleep(5);
+            continue;
+        }
+
         // 没有数据
         //        if(packs.empty() || !decode || !res || !ap)
         //        {
@@ -62,7 +69,7 @@ void XAudioThread::run()
                 if(size <= 0)
                     break;
                 // 缓冲未播完，空间不够
-                if(ap->GetFree() < size)
+                if(ap->GetFree() < size || isPause)
                 {
                     msleep(1);
                     continue;
@@ -136,4 +143,13 @@ void XAudioThread::Close()
         ap = nullptr;
         amux.unlock();
     }
+}
+
+void XAudioThread::SetPause(bool isPause)
+{
+    //    amux.lock();
+    this->isPause = isPause;
+    if(ap)
+        ap->SetPause(isPause);
+    //    amux.unlock();
 }

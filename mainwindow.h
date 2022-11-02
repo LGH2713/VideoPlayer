@@ -31,11 +31,20 @@ public:
     // 定时器 滑动条显示
     void timerEvent(QTimerEvent *e);
 
+    // 窗口尺寸变化
+    void resizeEvent(QResizeEvent *e);
+
+    // 双击全屏
+    void mouseDoubleClickEvent(QMouseEvent *e);
+
+    void SetPause(bool isPause);
+
 private:
     Ui::MainWindow *ui;
 
 private slots:
     void on_openFile_clicked();
+    void on_isPlay_clicked();
 };
 
 int running();

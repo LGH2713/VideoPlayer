@@ -49,6 +49,12 @@ void XVideoThread::run()
     while(!isExit)
     {
         vmux.lock();
+        if(this->isPause)
+        {
+            vmux.unlock();
+            msleep(5);
+            continue;
+        }
 
         // 音视频同步
         if(synpts > 0 && synpts < decode->pts)
@@ -93,4 +99,11 @@ void XVideoThread::run()
         }
         vmux.unlock();
     }
+}
+
+void XVideoThread::SetPause(bool isPause)
+{
+    vmux.lock();
+    this->isPause = isPause;
+    vmux.unlock();
 }

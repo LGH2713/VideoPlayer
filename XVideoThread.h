@@ -30,6 +30,9 @@ public:
     // 同步时间由外部传入
     long long synpts = 0;
 
+    void SetPause(bool isPause);
+    bool isPause = false;
+
 protected:
     std::mutex vmux;
     IVideoCall *call = 0;

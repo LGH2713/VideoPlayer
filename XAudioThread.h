@@ -25,6 +25,9 @@ public:
     // 当前音频播放的pts
     long long pts = 0;
 
+    void SetPause(bool isPause);
+    bool isPause = false;
+
 protected:
     std::mutex amux;
     XAudioPlay *ap = 0;

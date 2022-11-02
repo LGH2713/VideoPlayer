@@ -31,6 +31,9 @@ public:
     long long pts = 0;
     long long totalMs = 0;
 
+    void SetPause(bool isPause);
+    bool isPause = false;
+
 protected:
     std::mutex mux;
     XDemux *demux = 0;

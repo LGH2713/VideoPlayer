@@ -106,6 +106,25 @@ public:
         mux.unlock();
         return pts;
     }
+
+    virtual void SetPause(bool isPause)
+    {
+        mux.lock();
+        if(!output)
+        {
+            mux.unlock();
+            return;
+        }
+        if(isPause)
+        {
+            output->suspend();
+        }
+        else
+        {
+            output->resume();
+        }
+        mux.unlock();
+    }
 };
 
 XAudioPlay::XAudioPlay()
@@ -123,5 +142,6 @@ XAudioPlay *XAudioPlay::Get()
     static CXAudioPlay play;
     return &play;
 }
+
 
 
