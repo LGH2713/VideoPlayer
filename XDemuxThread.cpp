@@ -84,6 +84,15 @@ void XDemuxThread::Close()
     mux.unlock();
 }
 
+void XDemuxThread::SetPause(bool isPause)
+{
+    mux.lock();
+    this->isPause = isPause;
+    if(at) at->SetPause(isPause);
+    if(vt) vt->SetPause(isPause);
+    mux.unlock();
+}
+
 void XDemuxThread::run()
 {
     while(!isExit)
@@ -92,6 +101,7 @@ void XDemuxThread::run()
 
         if(isPause)
         {
+            mux.unlock();
             msleep(5);
             continue;
         }
@@ -133,11 +143,4 @@ void XDemuxThread::run()
     }
 }
 
-void XDemuxThread::SetPause(bool isPause)
-{
-    mux.lock();
-    this->isPause = isPause;
-    if(at) at->SetPause(isPause);
-    if(vt) vt->SetPause(isPause);
-    mux.unlock();
-}
+

@@ -71,7 +71,7 @@ void MainWindow::on_openFile_clicked()
         return ;
     }
 
-    SetPause(dt.isPause);
+    SetPause(false);
 }
 
 
