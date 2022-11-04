@@ -84,6 +84,18 @@ void XDemuxThread::Close()
     mux.unlock();
 }
 
+void XDemuxThread::Clear()
+{
+    mux.lock();
+    if(demux)
+        demux->Clear();
+    if(vt)
+        vt->Clear();
+    if(at)
+        at->Clear();
+    mux.unlock();
+}
+
 void XDemuxThread::SetPause(bool isPause)
 {
     mux.lock();
@@ -141,6 +153,14 @@ void XDemuxThread::run()
         mux.unlock();
         msleep(1);
     }
+}
+
+void XDemuxThread::Seek(double pos)
+{
+    mux.lock();
+    if(demux)
+        demux->Seek(pos);
+    mux.unlock();
 }
 
 

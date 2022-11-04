@@ -23,8 +23,11 @@ public:
 
     // 关闭线程，清理资源
     virtual void Close();
+    virtual void Clear();
 
     void run();
+
+    virtual void Seek(double pos);
 
     bool isExit = false;
 

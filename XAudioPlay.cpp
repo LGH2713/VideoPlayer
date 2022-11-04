@@ -47,6 +47,16 @@ public:
         mux.unlock();
     }
 
+    virtual void Clear()
+    {
+        mux.lock();
+        if(io)
+        {
+            io->reset();
+        }
+        mux.unlock();
+    }
+
     virtual bool Write(const unsigned char *data, int datasize)
     {
         if(!data || datasize == 0)

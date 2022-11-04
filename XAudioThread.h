@@ -21,6 +21,7 @@ public:
 
     // 停止线程，清理资源
     virtual void Close();
+    virtual void Clear();
 
     // 当前音频播放的pts
     long long pts = 0;

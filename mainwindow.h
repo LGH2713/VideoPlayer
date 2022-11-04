@@ -39,12 +39,16 @@ public:
 
     void SetPause(bool isPause);
 
+    bool isSliderPress = false;
+
 private:
     Ui::MainWindow *ui;
 
 private slots:
     void on_openFile_clicked();
     void on_isPlay_clicked();
+    void on_playPos_sliderPressed();
+    void on_playPos_sliderReleased();
 };
 
 int running();

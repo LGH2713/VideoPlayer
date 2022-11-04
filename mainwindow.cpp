@@ -23,6 +23,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::timerEvent(QTimerEvent *e)
 {
+    if(isSliderPress) return;
     long long total = dt.totalMs;
     if(total > 0)
     {
@@ -80,5 +81,20 @@ void MainWindow::on_isPlay_clicked()
     bool isPause = !dt.isPause;
     SetPause(isPause);
     dt.SetPause(isPause);
+}
+
+
+void MainWindow::on_playPos_sliderPressed()
+{
+    isSliderPress = true;
+}
+
+
+void MainWindow::on_playPos_sliderReleased()
+{
+    isSliderPress = false;
+    double pos = 0.0;
+    pos = static_cast<double>(ui->playPos->value()) / static_cast<double>(ui->playPos->maximum());
+    dt.Seek(pos);
 }
 
