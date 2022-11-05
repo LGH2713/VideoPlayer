@@ -27,6 +27,9 @@ public:
     // seek 位置 pos 0.0~1.0
     virtual bool Seek(double pos);
 
+    // 只读视频，音频丢弃空间释放
+    virtual AVPacket *ReadVideo();
+
     virtual bool IsAudio(AVPacket *pkt);
 
     // 清理和关闭函数
@@ -42,15 +45,15 @@ public:
     int sampleRate = 0;
     int channels = 0;
 
-    // 音视频索引，读取时区分音视频
-    int videoStream = -1;
-    int audioStream = -1;
-
 protected:
     std::mutex mux;
 
     //解封装上下文
     AVFormatContext *ic = nullptr;
+
+    // 音视频索引，读取时区分音视频
+    int videoStream = -1;
+    int audioStream = -1;
 };
 
 #endif // XDEMUX_H

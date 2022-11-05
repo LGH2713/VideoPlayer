@@ -13,6 +13,12 @@ void XFreePacket(AVPacket **pkt)
     av_packet_free(pkt);
 }
 
+void XFreeFrame(AVFrame **frame)
+{
+    if(!frame || !(*frame))
+        return;
+    av_frame_free(frame);
+}
 
 XDecode::XDecode()
 {

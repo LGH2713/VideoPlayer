@@ -64,16 +64,16 @@ void XVideoThread::run()
             continue;
         }
 
-//        // 没有数据
-//        if(packs.empty() || !decode)
-//        {
-//            vmux.unlock();
-//            msleep(1);
-//            continue;
-//        }
+        //        // 没有数据
+        //        if(packs.empty() || !decode)
+        //        {
+        //            vmux.unlock();
+        //            msleep(1);
+        //            continue;
+        //        }
 
-//        AVPacket *pkt = packs.front();
-//        packs.pop_front();
+        //        AVPacket *pkt = packs.front();
+        //        packs.pop_front();
         AVPacket *pkt = Pop();
         bool ret = decode->Send(pkt);
         if(!ret)
@@ -99,6 +99,36 @@ void XVideoThread::run()
         }
         vmux.unlock();
     }
+}
+
+bool XVideoThread::RepaintPts(AVPacket *pkt, long long seekpts)
+{
+    vmux.lock();
+    bool ret = decode->Send(pkt);
+    if(!ret)
+    {
+        vmux.unlock();
+        return true;
+    }
+    AVFrame *frame = decode->Recv();
+    if(!frame)
+    {
+        vmux.unlock();
+        return false;
+    }
+    // 到达位置
+    if(decode->pts >= seekpts)
+    {
+        if(call)
+            call->Repaint(frame);
+        vmux.unlock();
+        return true;
+    }
+
+    XFreeFrame(&frame);
+
+    vmux.unlock();
+    return false;
 }
 
 void XVideoThread::SetPause(bool isPause)

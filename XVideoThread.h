@@ -24,6 +24,9 @@ public:
     virtual bool Open(AVCodecParameters *para, IVideoCall *call, int width, int height);
     void run();
 
+    // 解码pts，如果接收到的解码数据pts >= seekpts return true 并且显示画面
+    virtual bool RepaintPts(AVPacket *pkt, long long seekpts);
+
     //最大队列
     int maxList = 100;
     bool isExit = false;
@@ -33,10 +36,10 @@ public:
     void SetPause(bool isPause);
     bool isPause = false;
 
-    IVideoCall *call = 0;
-
 protected:
     std::mutex vmux;
+    IVideoCall *call = 0;
+
 };
 
 #endif // XVIDEOTHREAD_H

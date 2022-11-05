@@ -180,27 +180,17 @@ void XDemuxThread::Seek(double pos)
     long long seekPts = pos * demux->totalMs;
     while(!isExit)
     {
-        AVPacket *pkt = demux->Read();
+        AVPacket *pkt = demux->ReadVideo();
         if(!pkt)
             break;
-        if(pkt->stream_index == demux->audioStream)
-        {
-            // 是音频数据则丢弃
-            av_packet_free(&pkt);
-            continue;
-        }
 
-        bool ret = vt->decode->Send(pkt);
-        AVFrame *frame = vt->decode->Recv();
-        if(!frame) continue;
-        // 到达位置
-        if(frame->pts >= seekPts)
+        // 如果解码到pts
+        if(vt->RepaintPts(pkt, seekPts))
         {
-            this->pts = frame->pts;
-            vt->call->Repaint(frame);
+            this->pts = seekPts;
             break;
         }
-        av_frame_free(&frame);
+
     }
     mux.unlock();
 

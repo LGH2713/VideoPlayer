@@ -26,12 +26,12 @@ public:
     int maxList = 100;
     bool isExit = false;
 
-    // 解码器
-    XDecode *decode = 0;
-
 protected:
     std::list<AVPacket *> packs;
     std::mutex mux;
+
+    // 解码器
+    XDecode *decode = 0;
 };
 
 #endif // XDECODETHREAD_H
