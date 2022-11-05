@@ -2,6 +2,11 @@
 #include "XDemux.h"
 #include "XVideoThread.h"
 #include "XAudioThread.h"
+#include "XDecode.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+}
 
 #include <iostream>
 using namespace std;
@@ -157,10 +162,51 @@ void XDemuxThread::run()
 
 void XDemuxThread::Seek(double pos)
 {
+    // 清理缓冲
+    Clear();
+
+    mux.lock();
+    bool status = this->isPause;
+    mux.unlock();
+
+    // 暂停
+    SetPause(true);
+
     mux.lock();
     if(demux)
         demux->Seek(pos);
+
+    // 实际要显示的位置pts
+    long long seekPts = pos * demux->totalMs;
+    while(!isExit)
+    {
+        AVPacket *pkt = demux->Read();
+        if(!pkt)
+            break;
+        if(pkt->stream_index == demux->audioStream)
+        {
+            // 是音频数据则丢弃
+            av_packet_free(&pkt);
+            continue;
+        }
+
+        bool ret = vt->decode->Send(pkt);
+        AVFrame *frame = vt->decode->Recv();
+        if(!frame) continue;
+        // 到达位置
+        if(frame->pts >= seekPts)
+        {
+            this->pts = frame->pts;
+            vt->call->Repaint(frame);
+            break;
+        }
+        av_frame_free(&frame);
+    }
     mux.unlock();
+
+    // seek是非暂停状态
+    if(!status)
+        SetPause(false);
 }
 
 
