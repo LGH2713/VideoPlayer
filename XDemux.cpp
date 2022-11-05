@@ -187,11 +187,20 @@ bool XDemux::Seek(double pos)
 
 AVPacket *XDemux::ReadVideo()
 {
+    mux.lock();
+    if(!ic)
+    {
+        mux.unlock();
+        return nullptr;
+    }
+    mux.unlock();
     AVPacket *pkt = NULL;
     // 防止阻塞
     for(int i = 0; i < 20; i++)
     {
         pkt = Read();
+        if(!pkt)
+            break;
         if(pkt->stream_index == videoStream)
         {
             break;

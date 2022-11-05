@@ -26,7 +26,7 @@
      </widget>
     </item>
    </layout>
-   <widget class="QSlider" name="playPos">
+   <widget class="XSlider" name="playPos">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -87,6 +87,11 @@
    <class>XVideoWidget</class>
    <extends>QOpenGLWidget</extends>
    <header>XVideoWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>XSlider</class>
+   <extends>QSlider</extends>
+   <header>XSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

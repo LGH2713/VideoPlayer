@@ -49,6 +49,8 @@ set(PROJECT_SOURCES
     XDemuxThread.h
     XDecodeThread.cpp
     XDecodeThread.h
+    XSlider.cpp
+    XSlider.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
